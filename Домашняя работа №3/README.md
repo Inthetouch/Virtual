@@ -46,12 +46,12 @@
     - ```ENV NB_GID=100```
     #### Запускаем Jupyter Notebook с параметрами командной строки
     - ```CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8889", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks"]```
-    ##### "jupyter", "notebook" - Запускает контейнер поумолчанию с определенными параметрами.
-    ##### "--ip=0.0.0.0", "--port=8889" - Устанавливает порт и прослушивание всех доступных IP-адресов контейра.
-    ##### "--no-browser" - Отключает открытие браузера при запуске.
-    ##### "--allow-root" - Разрешает запускать Jupyter Notebook в режиме root.
-    ##### "--NotebookApp.token=''" - Устанавливает токен для доступа к Jupyter Notebook.
-    ##### "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks" - Устанавливает рабочую директорию для Jupyter Notebook.
+    - ##### "jupyter", "notebook" - Запускает контейнер поумолчанию с определенными параметрами.
+    - ##### "--ip=0.0.0.0", "--port=8889" - Устанавливает порт и прослушивание всех доступных IP-адресов контейра.
+    - ##### "--no-browser" - Отключает открытие браузера при запуске.
+    - ##### "--allow-root" - Разрешает запускать Jupyter Notebook в режиме root.
+    - ##### "--NotebookApp.token=''" - Устанавливает токен для доступа к Jupyter Notebook.
+    - ##### "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks" - Устанавливает рабочую директорию для Jupyter Notebook.
 3. Собрать образ с помощью команды ```docker build```.
     - ```docker build -t jupyter-image .```
     - Флаг -t позволяет присвоить наименование образу.
