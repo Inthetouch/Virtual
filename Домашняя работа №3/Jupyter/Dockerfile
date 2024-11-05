@@ -1,16 +1,13 @@
 #Базовый образ Jupyter
-FROM jupyter/base-notebook:latest
-#Переключаемся на пользователя root
-USER root
-#Устанавливаем Bash
-RUN apt-get update && apt-get install -y bash
-# Устанавливаем Pandas
-RUN pip install --no-cache-dir pandas
-#Копируем директорию с Jupyter notebooks в контейнер
-COPY all_notebooks /home/jovyan/all_notebooks
-#Настраиваем рабочую директорию
-WORKDIR /home/jovyan/all_notebooks
-#Открываем порт 8888 для доступа к Jupyter Notebook
-EXPOSE 8888
-#Запускаем Jupyter Notebook
-CMD [ "/bin/bash","start-notebook.sh", "--NotebookApp.token=''", "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks" ]
+FROM jupyter/minimal-notebook:latest
+#Создаем папку для ноутбуков
+RUN mkdir /home/jovyan/all_notebooks
+#Устанавливаем необходимые права на папку
+RUN chown -R jovyan:users /home/jovyan/all_notebooks
+#Устанавливаем переменные среды
+ENV JUPYTER_ENABLE_LAB=yes
+ENV NB_USER=jovyan
+ENV NB_UID=1000
+ENV NB_GID=100
+#Запускаем Jupyter Notebook с параметрами командной строки
+CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8889", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks"]
