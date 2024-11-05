@@ -27,36 +27,41 @@
     - Флаг -d позволяет запускать образ в фоновом режиме.
 
 ## Развернуть свой сервер на котором будут храниться Jupiter notebooks. 
-В директории all_notebooks хранятся файлы ipynb которые должны показыватся по умолчанию всем пользователям.
-1. Создаем Dockerfile со следующими инструкциями:
-    - Используем официальный образ Jupyter Notebook
-
-    ```FROM jupyter/base-notebook:latest```
-    - Переключаемся на пользователя ```root```
-
-    ```USER root```
-    - Устанавливаем необходимые зависимости.
-
-    ```RUN apt-get update && apt-get install -y bash```
-    
-    ```RUN pip install --no-cache-dir pandas```
-    - Копируем директорию all_notebooks в контейнер. Jovyan - пользователь Jupyter Notebook. Данный пользователь - это пользователь который создается в образах Jupyter.
-
-    ```COPY all_notebooks /home/jovyan/all_notebooks```
-    - Открываем порт 8888 для доступа к Jupyter Notebook.
-
-    ```EXPOSE 8888```
-    - Запускаем Jupyter Notebook.
-
-    ```CMD [ "/bin/bash","start-notebook.sh", "--NotebookApp.token=''", "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks" ]```
-        
-        - ```start-notebook.sh``` - скрипт запускающий Jupyter Notebook.
-        - ```NotebookApp.token``` - токен для доступа к Jupyter Notebook.
-        - ```NotebookApp.notebook_dir``` - директория с Jupyter notebooks.
-
-## Сборка и запуск контейнера.
-1. Собираем образ с помощью команды ```docker build -t jupyter-server .```
-2. Запускаем образ с помощью команды ```docker run -p 8888:8888 -v "$(pwd)/all_notebooks":/home/jovyan/all_notebooks my-jupyter-notebook```
-- ```-p 8888:8888``` - указываем порт для доступа к Jupyter Notebook.
-- ```-v "$(pwd)/all_notebooks":/home/jovyan/all_notebooks``` - указываем директорию с notebooks в образе.
-
+1. Для сборки соберем Dockerfile - файл содержащий инструкции для сборки.
+    - ```touch Jupyter/Dockerfile```
+2. В Dockerfile прописать следующие инструкции:
+    #### Базовый образ Jupyter
+    - ```FROM jupyter/minimal-notebook:latest```
+    #### Создаем папку для ноутбуков
+    - ```RUN mkdir /home/jovyan/all_notebooks```
+    #### Изменим владельца владельца или группы папки
+    - ```RUN chown -R jovyan:users /home/jovyan/all_notebooks```
+    #### Устанавливаем переменные окружения 
+    - ```ENV JUPYTER_ENABLE_LAB=yes```
+    #### Устанавливаем имя пользователя в контейнере как jovyan - имя которое используется поумолчанию
+    - ```ENV NB_USER=jovyan```
+    #### Устанавливаем UID пользователя в контейнере
+    - ```ENV NB_UID=1000```
+    #### Устанавливаем GID пользователя в контейнере
+    - ```ENV NB_GID=100```
+    #### Запускаем Jupyter Notebook с параметрами командной строки
+    - ```CMD ["jupyter", "notebook", "--ip=0.0.0.0", "--port=8889", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks"]```
+    ##### "jupyter", "notebook" - Запускает контейнер поумолчанию с определенными параметрами.
+    ##### "--ip=0.0.0.0", "--port=8889" - Устанавливает порт и прослушивание всех доступных IP-адресов контейра.
+    ##### "--no-browser" - Отключает открытие браузера при запуске.
+    ##### "--allow-root" - Разрешает запускать Jupyter Notebook в режиме root.
+    ##### "--NotebookApp.token=''" - Устанавливает токен для доступа к Jupyter Notebook.
+    ##### "--NotebookApp.notebook_dir=/home/jovyan/all_notebooks" - Устанавливает рабочую директорию для Jupyter Notebook.
+3. Собрать образ с помощью команды ```docker build```.
+    - ```docker build -t jupyter-image .```
+    - Флаг -t позволяет присвоить наименование образу.
+4. Запустить образ с помощью команды ```docker run```.
+    -   ```docker run -it -p 8889:8889 jupyter_custom```
+    - Флаг ```-i``` и ```-t``` используются вместе для интерактивного режима.
+        - ```-i``` поддерживает интерактивный режим, позволяя взаимодействовать с контейнером через терминал.
+        - ```-t``` позволяет псеводотерминал, что необходимо для работы командной строки в интерактивном режиме.
+    - Вместе флаги ```-it``` делают так, что я вижу логи контейнера и позволяет вводить команды в терминале.
+    - ```-p 8889:8889``` пробрасывает порт из контейнера на хост машину:
+        - ```8889``` - порт в хост машине. 
+        - ```8889``` - порт в контейнере.
+    - ```jupyter_custom``` - имя образа, которое мы создали.
