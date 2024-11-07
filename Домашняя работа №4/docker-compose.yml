@@ -2,7 +2,9 @@ version: '3'
 
 services:
   jupyterhub:
-    image: inthe/jupyter-image
+    image: inthe/jupyter_custom
+    environment:
+      - ADMIN_USER=inthe
     ports:
       - "8000:8000"
     volumes:
