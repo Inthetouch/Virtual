@@ -1,0 +1,49 @@
+name: Pipeline for JupyterHub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Login in Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/jupyter_custom:latest --build-arg ADMIN_USER='inthe' .
+
+      - name: Test Docker container
+        run: |
+          docker run -d --name test_container -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/jupyter_custom:latest
+          # Ожидание в 10 секунд
+          sleep 10
+          # Проверка статуса контейнера
+          if docker ps | grep -q test_container; then
+            echo "Docker container is running"
+          else
+            echo "Docker container is not running" && exit 1
+          fi
+        
+      - name: Test Docker image
+        run: |
+          echo "Image build and tested"
+
+      - name: Stop conainer
+        run: |
+          docker stop test_container
+          docker rm test_container
+
+      - name: Push Docker image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/jupyter_custom_tested:latest
