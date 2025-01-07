@@ -1,12 +1,32 @@
-#Используем официальный образ Python в качестве основы
-FROM python:3.9
-#Устанавливаем рабочий каталог
+# Этап 1: Сборка frontend
+FROM node:16 AS frontend-builder
+#Устанавливаем рабочую директорию
 WORKDIR /app
+#Копируем package.json и package-lock.json
+COPY frontend/package.json .
+COPY frontend/package-lock.json .
 #Устанавливаем зависимости
-COPY ./backend/requirements.txt .
+RUN npm install
+#Копируем файлы frontend
+COPY frontend/ .
+#Собираем frontend
+RUN npm run build
+
+#Этап 2: Сборка backend и копирование frontend'a
+FROM python:3.9-slim AS backend-builder
+#Устанавливаем рабочую директорию
+WORKDIR /app
+#Копируем requirements.txt в директорию приложения
+COPY backend/requirements.txt .
 #Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
-#Копируем все содержимое в рабочую директорию
-COPY . .
-#Определяем команды, которые будут выполняться при запуске контейнера
-CMD ["gunicorn", "backend.wsgi:application", "--bind", "0.0.0.0:8000"]
+#Копируем директорию backend в контейнер
+COPY backend/ /app/
+#Копируем необходимые файлы из предыдущего этапа (frontend)
+COPY --from=frontend-builder /app/build /app/frontend/build
+
+# Открываем порт, на котором работает приложение
+EXPOSE 8000
+
+# Запускаем сервер
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -1,0 +1,31 @@
+#Сервисы Docker
+services:
+  #Сервис backend
+  backend:
+    #Указываем что сервис будет создан на основе Dockerfile
+    build:
+      context: .
+      dockerfile: Dockerfile
+    #Указываем порты
+    ports:
+      - "8000:8000"
+    #Указываем зависимости
+    depends_on:
+      - database
+
+  #Сервис базы данных
+  database:
+    #Указываем образ для сервиса
+    image: postgres:13
+    #Указываем переменные окружения для контейнера базщы данных
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: taskidb
+    #Определяю том который будет использоваться для хранения данных
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+#Определяю том на уровне всего проекта
+volumes:
+  db_data:
