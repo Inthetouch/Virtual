@@ -65,7 +65,7 @@ DATABASES = {
         'NAME': 'taskidb', # имя базы данных
         'USER': 'admin', # имя пользователя
         'PASSWORD': 'admin', # пароль
-        'HOST': 'db',  # имя сервиса базы данных в docker-compose
+        'HOST': 'database',  # имя сервиса базы данных в docker-compose
         'PORT': '5432', # порт для подключения
     }
 }

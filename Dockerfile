@@ -20,6 +20,8 @@ WORKDIR /app
 COPY backend/requirements.txt .
 #Устанавливаем зависимости
 RUN pip install --no-cache-dir -r requirements.txt
+#Устанавка сетевых утилит
+RUN apt-get update && apt-get install -y iputils-ping telnet postgresql-client
 #Копируем директорию backend в контейнер
 COPY backend/ /app/
 #Копируем необходимые файлы из предыдущего этапа (frontend)
@@ -29,4 +31,4 @@ COPY --from=frontend-builder /app/build /app/frontend/build
 EXPOSE 8000
 
 # Запускаем сервер
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["bash", "-c", "python /app/wait_for_db.py && python manage.py runserver 0.0.0.0:8000"]
