@@ -20,7 +20,7 @@ services:
   #Сервис базы данных
   database:
     #Указываем образ для сервиса
-    image: postgres:13
+    image: postgres:latest
     #Указываем имя контейнера
     container_name: database
     #Указываем переменные окружения для контейнера базщы данных
