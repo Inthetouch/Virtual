@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: inthe/backend
     container_name: backend
     #Указываем порты
     ports:
