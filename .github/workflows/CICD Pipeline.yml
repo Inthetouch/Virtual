@@ -57,14 +57,13 @@ jobs:
             - name: Start Minikube
               uses: medyagh/setup-minikube@latest
 
-            - name: Set Minikube Config
+            - name: Wait initial Minikube setup
               run: |
-                  mkdir -p ~/.kube
-                  echo "${{ secrets.KUBE_CONFIG_DATA }}" > ~/.kube/config
+                  sleep 10
 
-            - name: Wait update config Minikube
+            - name: Generate Minikube config
               run: |
-                  sleep 30
+                  minikube config view
 
             - name: Deploy to Minikube
               run: |
